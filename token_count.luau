@@ -1,25 +1,27 @@
 -- Simple Token Count Script
 -- Prints total tokens (regular + paid) for the local player
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Replication = require(ReplicatedStorage.Game.Replication)
 
--- Get player data module (adjust path based on your game structure)
-local PlayerData = require(game.ReplicatedStorage:WaitForChild("Modules"):WaitForChild("PlayerData"))
+-- Wait for data to load if not already loaded
+if not Replication.Loaded then
+    Replication:Connect("DataLoaded", function() end)
+    repeat task.wait() until Replication.Loaded
+end
 
--- Get current player's data
-local data = PlayerData.Data or PlayerData:GetData()
+local data = Replication.Data
 
 if data and data.Items then
     local tokens = data.Items.Tokens or 0
     local paidTokens = data.Items.PaidTokens or 0
-    local totalTokens = tokens + paidTokens
+    local total = tokens + paidTokens
     
     print("=== TOKEN COUNT ===")
-    print("Regular Tokens: " .. tostring(tokens))
-    print("Paid Tokens: " .. tostring(paidTokens))
-    print("Total Tokens: " .. tostring(totalTokens))
+    print("Tokens: " .. tokens)
+    print("Paid Tokens: " .. paidTokens) 
+    print("Total: " .. total)
     print("===================")
 else
-    warn("Could not access player data!")
+    warn("Data not available")
 end
